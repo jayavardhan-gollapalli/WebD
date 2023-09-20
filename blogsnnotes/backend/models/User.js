@@ -13,9 +13,8 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
-
-  codename: {
-    type: String,
+  liked:{
+    type: [String]
   },
   password:{
     type: String,

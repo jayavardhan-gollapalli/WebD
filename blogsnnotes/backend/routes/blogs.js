@@ -5,16 +5,49 @@ const Blog = require('../models/Blog');
 const fetchUser = require('../middleware/fetchUser');
 
 
-router.get('/all',async (req,res)=>{
-    let blogs=await Blog.find({public:true});
-    // console.log(blogs);
-    res.send(blogs);
+router.get('/publicBlogs',async (req,res)=>{
+    try{
+        let data=await Blog.find({public:true}).lean();
+        data.forEach((blog)=>{
+            delete blog.user;
+        })
+        console.log(afdhadf);
+        res.send({success:true,data});
+        // {
+        //     "success": true,
+        //     "data": [
+        //       {
+        //         "_id": "65083706b7f02ea0cf4f066f",
+        //         "title": "daadtahaf",
+        //         "tag": [],
+        //         "description": "fdallfdjajdfkadfajdfalkjfdkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkfdallfdjkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkfdallfdjajdfkadfajdfkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+        //         "public": true,
+        //         "author": "Anonymous",
+        //         "date": "2023-09-18T11:39:50.097Z",
+        //         "__v": 0
+        //       }
+        //     ]
+        //   }
+    }catch(e){
+        res.send({success:false, error:e});
+    }
 })
 router.get('/myBlogs',fetchUser,async (req,res)=>{
     let public=await Blog.find({user:req.body.user,public:true});
     let private=await Blog.find({public:false});
     // console.log(blogs);
     res.send({public,private});
+})
+
+//sends the blog details of the blog
+router.get('/blog/:id',async(req,res)=>{
+    try{
+        let note= await Blog.findById(req.params.id);
+        // note.user= null;
+        res.send({success:true, note})
+    }catch(error){
+        res.send({success:false, error});
+    }
 })
 
 router.post('/addBlog',[
@@ -40,7 +73,7 @@ router.post('/addBlog',[
     }
     try{
         console.log("body after fetching user",req.body);
-        let {title,id,tags,description}=req.body;
+        let {title,id,tags,description,public}=req.body;
         // body after fetching user {
         //     email: 'jaya@gmail.com',
         //     name: 'jayavardhan',
@@ -55,15 +88,16 @@ router.post('/addBlog',[
             user:id,
             title,
             description,
-            tags
+            tags,
+            public
         })
         blog.save();
         res.send({success:true,blog});
         return;
-    }catch(e){
+    }catch(err){
         success=false;
         console.log("Errors in saving")
-        res.send({success,error:e})
+        res.send({success,error:err})
         return;
     }
 })

@@ -3,25 +3,42 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 
 const initialState = {
   publicBlogs: {
-    loading: true,
+    loaded: false,
     blogs: [],
   },
   myBlogs: {
     private: [],
     public: [],
-    loading: true,
+    liked:[],
+    loaded: true,
   },
 };
 
 let host = "http://localhost:5000";
 // const authtoken = localStorage.getItem("token");
 
-export const getAllBlogs = createAsyncThunk(
-  "blogSlice/getAllBlogs",
+export const getPublicBlogs = createAsyncThunk(
+  "blogSlice/getPublicBlogs",
   async () => {
-    let url = `${host}/api/blogs/all`;
+    let url = `${host}/api/blogs/publicBlogs`;
     try {
       let response = await fetch(url);
+      // {
+      //   "success": true,
+      //   "blogs": [
+      //     {
+      //       "_id": "650836c555a27f1489e1219d",
+      //       "title": "daadtahaf",
+      //       "user": "64feed7b4235b415a4366907",
+      //       "tag": [],
+      //       "description": "\nLorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, ipsam totam cumque laborum repellendus atque quaerat cum est eveniet laboriosam, corporis eaque quibusdam nulla repellat consequatur? Ipsum, at excepturi! Eius!",
+      //       "public": true,
+      //       "author": "Anonymous",
+      //       "date": "2023-09-18T11:38:45.687Z",
+      //       "__v": 0
+      //     },
+      //   ]
+      // }
       let data = await response.json();
       console.log("data", data);
       return data;
@@ -75,15 +92,16 @@ const blogSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getAllBlogs.fulfilled, (state, action) => {
+    builder.addCase(getPublicBlogs.fulfilled, (state, action) => {
       // state.publicBlogs.loaded=true;
       console.log(action.payload);
       console.log("allBlogs", action.payload);
       state.publicBlogs.blogs = action.payload;
+      state.publicBlogs.loaded = true;
       console.log("state public blogs", state.publicBlogs.blogs);
     });
-    builder.addCase(getAllBlogs.rejected, (state, action) => {
-      state.publicBlogs.loaded = false;
+    builder.addCase(getPublicBlogs.rejected, (state, action) => {
+      state.publicBlogs.loaded = true;
     });
     builder.addCase(getMyBlogs.fulfilled, (state, action) => {
       // state.publicBlogs.loaded=true;

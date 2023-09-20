@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
-import { allPublicBlogs, getAllBlogs } from "../features/blogSlice";
+import { allPublicBlogs, getPublicBlogs } from "../features/blogSlice";
 import { useSelector, useDispatch, shallowEqual } from "react-redux";
 import BlogPreview from "./BlogPreview";
 import "../Style/Styling.css";
@@ -12,13 +12,7 @@ const Home = (props) => {
 
   const loggedin=useSelector(logged)
   let allBlogs = useSelector(allPublicBlogs);
-  useEffect(() => {
-    dispatch(getAllBlogs());
-  }, [dispatch]);
-  useEffect(()=>{
-  },[allBlogs])
-  
-  console.log("allblogs",allBlogs);
+
   return (
     <div className="center">
       {loggedin && <svg
@@ -35,6 +29,7 @@ const Home = (props) => {
               title={element.title}
               description={element.description}
               author={element.author}
+              id={element._id}
               tag={element.tag}
               date={element.date}
               key={element.date}

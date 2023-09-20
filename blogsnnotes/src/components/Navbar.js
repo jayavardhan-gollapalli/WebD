@@ -66,6 +66,11 @@ const Navbar = (props) => {
                   Un-Published
                 </Link>
               </li>
+              <li className="nav-item">
+                <Link className="nav-link active" aria-current="page" to='/unPublished'>
+                  Liked
+                </Link>
+              </li>
             </ul>
           {showLogin && <Login view={true} close={login} />}
           {showSignup && <SignUp view={true} close={signup} />}
