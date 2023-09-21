@@ -7,15 +7,14 @@ const fetchUser = require('../middleware/fetchUser');
 
 router.get('/publicBlogs',async (req,res)=>{
     try{
-        let data=await Blog.find({public:true}).lean();
-        data.forEach((blog)=>{
+        let blogs=await Blog.find({public:true}).lean();
+        blogs.forEach((blog)=>{
             delete blog.user;
         })
-        console.log(afdhadf);
-        res.send({success:true,data});
+        res.send({success:true,blogs});
         // {
         //     "success": true,
-        //     "data": [
+        //     "blogs": [
         //       {
         //         "_id": "65083706b7f02ea0cf4f066f",
         //         "title": "daadtahaf",
@@ -29,7 +28,13 @@ router.get('/publicBlogs',async (req,res)=>{
         //     ]
         //   }
     }catch(e){
-        res.send({success:false, error:e});
+        error={
+            name:e.name,
+            message:e.message,
+            stack:e.stack            
+        }
+        console.log("error",e);
+        res.send({success:false,error});
     }
 })
 router.get('/myBlogs',fetchUser,async (req,res)=>{
@@ -40,13 +45,28 @@ router.get('/myBlogs',fetchUser,async (req,res)=>{
 })
 
 //sends the blog details of the blog
-router.get('/blog/:id',async(req,res)=>{
+router.get('/blog/:id',fetchUser,async(req,res)=>{
     try{
-        let note= await Blog.findById(req.params.id);
-        // note.user= null;
-        res.send({success:true, note})
-    }catch(error){
-        res.send({success:false, error});
+        // console.log(Jayavardhan);
+        let blog= await Blog.findById(req.params.id).lean();
+        console.log(req.body.user.is);
+        if(req.body.user.is){
+            if(blog.user===req.body.user.details.id){
+                blog.readit= true;
+            }else{
+                blog.readit=false;
+            }
+        }else{
+            blog.readit=false;
+        }
+        await delete blog.user;
+        res.send({success:true, blog})
+    }catch(e){
+        res.send({success:false, error:{
+            name:e.name,
+            message:e.message,
+            stack:e.stack
+        }});
     }
 })
 
@@ -73,7 +93,12 @@ router.post('/addBlog',[
     }
     try{
         console.log("body after fetching user",req.body);
-        let {title,id,tags,description,public}=req.body;
+        let {title,description,public}=req.body;
+        let id= req.body.user.details.id;
+        let tags =await req.body.tags.map((element)=>{
+            return element;
+        })
+        console.log("tags",tags);
         // body after fetching user {
         //     email: 'jaya@gmail.com',
         //     name: 'jayavardhan',

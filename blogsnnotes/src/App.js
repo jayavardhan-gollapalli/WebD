@@ -19,7 +19,7 @@ function App() {
     console.log("Initiating getting user details and public blogs")
     dispatch( getUser() );
     dispatch( getPublicBlogs() );
-  },[dispatch])
+  })
   // let  loggedin = useSelector(logged);
   // console.log(loggedin);
   return (
@@ -28,7 +28,7 @@ function App() {
     <Navbar/>
   <Routes>
     
-    <Route exact path='api/blogs/blog/:id' element={<Blog/>}></Route>
+    <Route exact path='/blog/:id' element={<Blog/>}></Route>
     <Route exact path='/' element={<Home/>}></Route>
     <Route exact path='/yourBlogs' element={<YourBlog/>}></Route>
     <Route exact path='/unPublished' element={<Unpublished/>}></Route>

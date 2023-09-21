@@ -16,14 +16,13 @@ const Navbar = (props) => {
   let loggedin= useSelector( logged );
   
   const logOut=()=>{
-    dispatch(logout);
     console.log("loggedin before",loggedin);
-    loggedin=false;
+    dispatch(logout());
     console.log("loggedin",loggedin);
   }
   useEffect(()=>{
     console.log("loggedin after effect", loggedin)
-  },[dispatch, loggedin])
+  },[])
   const login=()=>{ 
     setShowLogin(!showLogin);
     console.log("Login is called");

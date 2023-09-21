@@ -55,25 +55,26 @@ router.get('/createAccount',[
 // error 1 for no user found
 // error 2 for wrong password
 router.post('/login',async (req,res)=>{
-    let user= await User.findOne({email:req.body.email});
-    if(!user)res.send({success:false,error:1});
+    let user= await User.findOne({email:req.body.email}).lean();
+    if(!user)res.send({success:false,error:"No user with that mail"});
     else{
         console.log(user);
         let compare= await bcrypt.compare(req.body.password,user.password);
         if(compare){
             let data= {
                 id: user._id,
-                email:user.email,
                 name: user.name,
+                email:user.email,
             }
             let authtoken= jwt.sign(data, JWT_SECRET);
+            data.authtoken = authtoken;
             // localStorage.setItem('token',authtoken);
             console.log(data);
-            res.send({success:true,authtoken});
+            res.send({success:true,user:data});
             return;
         }
         else {
-            res.send({success:false,error:2});
+            res.send({success:false,error:"Wrong credentials entered"});
         }
     }
 })

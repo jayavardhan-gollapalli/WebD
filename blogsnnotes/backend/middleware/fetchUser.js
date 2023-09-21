@@ -2,31 +2,16 @@ var jwt = require('jsonwebtoken');
 const JWT_SECRET="n@n!@jAY@";
 
 const fetchuser=async (req,res,next)=>{
-    console.log("Fetching user");
     let token= req.header('auth-token');
-    console.log(token);
-    if(!token){
-        req.body.user={is:false,error:{name:"JsonWebTokenError",message:"Token not present"}};
-        // {
-        //     "user": {
-        //       "is": false,
-        //       "error": {
-        //         "name": "JsonWebTokenError",
-        //         "message": "Token not present"
-        //       }
-        //     }
-        //   }
-        next();
-        return;
-    }
+    console.log("Fetching user with token", token);
     try {
-        let data= await jwt.verify(token, JWT_SECRET);
-        console.log(data);
-        req.body.user={is:true,data};
+        let details= await jwt.verify(token, JWT_SECRET);
+        console.log(details);
+        req.body.user={is:true,details};
         // {
         //     "user": {
         //       "is": true,
-        //       "data": {
+        //       "details": {
         //         "id": "64feed7b4235b415a4366907",
         //         "email": "jaya@gmail.com",
         //         "name": "jayavardhan",
@@ -43,6 +28,7 @@ const fetchuser=async (req,res,next)=>{
         //       "error": {
         //         "name": "JsonWebTokenError",
         //         "message": "invalid token"
+        //      or "message": "jwt must be provided"
         //       }
         //     }
         //   }

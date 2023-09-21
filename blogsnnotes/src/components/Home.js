@@ -6,13 +6,15 @@ import BlogPreview from "./BlogPreview";
 import "../Style/Styling.css";
 import Login from "./Login";
 import { logged } from "../features/userSlice";
+import { userDetails } from "../features/userSlice";
 
 const Home = (props) => {
   const dispatch = useDispatch();
-
-  const loggedin=useSelector(logged)
-  let allBlogs = useSelector(allPublicBlogs);
-
+  let user = useSelector( userDetails );
+  const loggedin=useSelector( logged );
+  let publicBlogs = useSelector(allPublicBlogs);
+  console.log("publicBlogs state",publicBlogs);
+  console.log("user state", user);
   return (
     <div className="center">
       {loggedin && <svg
@@ -23,20 +25,21 @@ const Home = (props) => {
         <path d="M256 80c0-17.7-14.3-32-32-32s-32 14.3-32 32V224H48c-17.7 0-32 14.3-32 32s14.3 32 32 32H192V432c0 17.7 14.3 32 32 32s32-14.3 32-32V288H400c17.7 0 32-14.3 32-32s-14.3-32-32-32H256V80z" />
       </svg>}
       <div className="flexbox">
-        {allBlogs.loading && allBlogs.blogs.length>0 && allBlogs.blogs.map((element) => {
+        {!publicBlogs.loading && !publicBlogs.errors && publicBlogs.blogs.length>0 && publicBlogs.blogs.map((element) => {
           return (
             <BlogPreview
               title={element.title}
               description={element.description}
               author={element.author}
               id={element._id}
-              tag={element.tag}
+              tags={element.tags}
               date={element.date}
-              key={element.date}
+              key={element._id}
             />
           );
         })}
-        {allBlogs.loading && !allBlogs.blogs.length && <div>There are no blogs for you to read</div> }
+        {!publicBlogs.loading && !publicBlogs.errors && !publicBlogs.blogs.length && <div>There are no blogs for you to read</div> }
+        {!publicBlogs.loading && publicBlogs.errors && !publicBlogs.blogs.length && <div>Some error ocurred while trying to fetch your feed {publicBlogs.errors.name}: {publicBlogs.errors.message}</div> }
       </div>
     </div>
   );
