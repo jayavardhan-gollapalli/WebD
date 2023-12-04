@@ -52,21 +52,21 @@ export const getPublicBlogs = createAsyncThunk(
     console.log("Running getPublicBlogs")
     let url = `${host}/api/blogs/publicBlogs`;
     let response = await fetch(url);
-      // {
-      //   "success": true,
-      //   "blogs": [
-      //     {
-      //       "_id": "650836c555a27f1489e1219d",
-      //       "title": "daadtahaf",
-      //       "tag": [],
-      //       "description": "\nLorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, ipsam totam cumque laborum repellendus atque quaerat cum est eveniet laboriosam, corporis eaque quibusdam nulla repellat consequatur? Ipsum, at excepturi! Eius!",
-      //       "public": true,
-      //       "author": "Anonymous",
-      //       "date": "2023-09-18T11:38:45.687Z",
-      //       "__v": 0
-      //     },
-      //   ]
-      // }
+  // {
+  //   "success": true,
+  //   "blogs": [
+  //     {
+  //       "_id": "650836c555a27f1489e1219d",
+  //       "title": "daadtahaf",
+  //       "tag": [],
+  //       "description": "\nLorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, ipsam totam cumque laborum repellendus atque quaerat cum est eveniet laboriosam, corporis eaque quibusdam nulla repellat consequatur? Ipsum, at excepturi! Eius!",
+  //       "public": true,
+  //       "author": "Anonymous",
+  //       "date": "2023-09-18T11:38:45.687Z",
+  //       "__v": 0
+  //     },
+  //   ]
+  // }
     let blogs = await response.json();
     return blogs;
   }
@@ -98,17 +98,19 @@ export const addBlog = createAsyncThunk("blogSlice/addBlogs", async () => {
     return error;
   }
 });
-export const getMyBlogs = createAsyncThunk("blogSlice/getMyBlogs", async () => {
+export const getUserBlogs = createAsyncThunk("blogSlice/getUserBlogs", async () => {
   let url = `${host}/api/blogs/myBlogs`;
   console.log(url);
-  try {
-    let response = await fetch(url);
-    let data = await response.json();
-    console.log("data", data);
-    return data;
-  } catch (error) {
-    return error;
-  }
+  let response = await fetch(url,{
+    method: "GET", // *GET, POST, PUT, DELETE, etc.
+    headers: {
+      "Content-Type": "application/json",
+      "auth-token": localStorage.getItem("token"),
+    },
+  });
+  let data = await response.json();
+  console.log("userBlogs", data);
+  return data;
 });
 
 const blogSlice = createSlice({
@@ -125,7 +127,7 @@ const blogSlice = createSlice({
         state.publicBlogs.errors = action.payload.error;
       }
       state.publicBlogs.loading = false;
-      console.log("state public blogs after fetching", state.publicBlogs.blogs);
+      console.log("state public blogs after fetching", state.publicBlogs.loading);
     });
     builder.addCase(getPublicBlogs.rejected, (state, action) => {
       console.log("getPublicBlogs rejected is running", action)
@@ -147,17 +149,26 @@ const blogSlice = createSlice({
       state.readingBlog.errors=action.payload.error;
       state.readingBlog.loading=false;
     })
-    builder.addCase(getMyBlogs.fulfilled, (state, action) => {
-      // state.publicBlogs.loaded=true;
-      console.log("action", action.payload);
-      console.log("myBlogs", action.payload);
-      state.myBlogs.private = action.payload.private;
-      state.myBlogs.public = action.payload.public;
-      console.log("state myBlogs blogs", state.myBlogs);
+    builder.addCase(getUserBlogs.fulfilled, (state, action) => {
+      console.log("userBlogs", action.payload);
+      if(action.payload.success){
+        state.myPrivateBlogs.blogs = action.payload.private;
+        state.myPublicBlogs.blogs = action.payload.public;
+      }else{
+        state.myPrivateBlogs.errors=action.error;
+        state.myPublicBlogs.errors=action.error;
+      }
+      state.myPrivateBlogs.loading=false;
+      state.myPublicBlogs.loading=false;
+      console.log("state my blogs after fetching", state.publicBlogs.loading);
     });
-    builder.addCase(getMyBlogs.rejected, (state, action) => {
+    builder.addCase(getUserBlogs.rejected, (state, action) => {
       console.log("getBlogs rejected", action);
-      state.publicBlogs.loaded = false;
+      state.myPrivateBlogs.errors=action.error;
+      state.myPublicBlogs.errors=action.error;
+      state.myPrivateBlogs.loading=false;
+      state.myPublicBlogs.loading=false;
+      console.log("state my blogs after fetching", state.publicBlogs.loading);
     });
     builder.addCase(addBlog.fulfilled, (state, action) => {
       if(action.payload.success){
@@ -166,7 +177,7 @@ const blogSlice = createSlice({
           state.myBlogs.public = state.myBlogs.public.concat(action.payload.blog);
           console.log(state.myBlogs.public);
           console.log(state.publicBlogs.blogs);
-        
+          
         }else{
           state.myBlogs.private = state.myBlogs.private.concat(action.payload.blog);
           console.log(state.myBlogs.private);
@@ -178,7 +189,7 @@ const blogSlice = createSlice({
 
 export const readit = (state)=> state.blogs.readingBlog.readit;
 export const reading= (state)=> state.blogs.readingBlog;
-export const myPrivateBlogs = (state) => state.blogs.myBlogs.private;
-export const myPublicBlogs = (state) => state.blogs.myBlogs.public;
+export const myPrivateBlogs = (state) => state.blogs.myPrivateBlogs;
+export const myPublicBlogs = (state) => state.blogs.myPublicBlogs;
 export const allPublicBlogs = (state) => state.blogs.publicBlogs;
 export default blogSlice.reducer;

@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Modal from "react-bootstrap/Modal";
 import { useDispatch } from "react-redux";
 import { loginUser } from "../features/userSlice";
+import { getUserBlogs } from "../features/blogSlice";
 
 const Login = (props) => {
   const [show, setShow] = useState(false);
@@ -26,6 +27,7 @@ const Login = (props) => {
 
   const submit=()=>{
     dispatch(loginUser(credentials));
+    dispatch( getUserBlogs() );
   }
 
   useEffect(() => {

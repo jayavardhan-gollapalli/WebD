@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Login from "./Login";
 import {
-  getMyBlogs,
+  getUserBlogs,
   myPrivateBlogs,
   myPublicBlogs,
 } from "../features/blogSlice";
@@ -17,8 +17,6 @@ const Unpublished = (props) => {
   // const [blogs, setBlogs]=useState([]);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  let loggedin= useSelector( logged );
-  console.log("loggedin",loggedin);
   const [showLogin, setShowLogin] = useState(false);
   const [showSignup, setShowSignup] = useState(false);
   const login = () => {
@@ -28,19 +26,21 @@ const Unpublished = (props) => {
   const add=()=>{
     dispatch(addBlog());
   }
-
+  
   const signup = () => {
     setShowSignup(!showSignup);
     console.log("Signup is called");
   };
   useEffect(() => {
-    dispatch(getMyBlogs());
-  }, [dispatch]);
-  let blogs = useSelector(myPrivateBlogs);
+    
+  },[]);
+  let blogs = useSelector( myPrivateBlogs );
+  let loggedin= useSelector( logged );
   console.log(blogs);
+  console.log("loggedin",loggedin);
   return (
     <div className="center mx-3">
-      {loggedin && (
+      {loggedin && !blogs.loading && !blogs.errors && (
         <>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -63,10 +63,16 @@ const Unpublished = (props) => {
                   />
                 );
               })}
-              {blogs.length===0?"You have no Unpublished Blogs":''}
           </div>
         </>
       )}
+      {loggedin && !blogs.loading && !blogs.errors && !blogs.blogs.length && <div>You have no Published Blogs</div>}
+      {loggedin && !blogs.loading && blogs.errors &&
+        <>
+          <p>Some error ocurred while fetching your blogs</p>
+          <p>{blogs.errors.name}:{blogs.errors.message}</p>
+        </>
+      }
       {showLogin && <Login view={true} close={login} />}
       {showSignup && <SignUp view={true} close={signup} />}
       {!loggedin && (

@@ -39,7 +39,7 @@ const Home = (props) => {
           );
         })}
         {!publicBlogs.loading && !publicBlogs.errors && !publicBlogs.blogs.length && <div>There are no blogs for you to read</div> }
-        {!publicBlogs.loading && publicBlogs.errors && !publicBlogs.blogs.length && <div>Some error ocurred while trying to fetch your feed {publicBlogs.errors.name}: {publicBlogs.errors.message}</div> }
+        {!publicBlogs.loading && publicBlogs.errors && <div>Some error ocurred while trying to fetch your feed {publicBlogs.errors.name}: {publicBlogs.errors.message}</div> }
       </div>
     </div>
   );

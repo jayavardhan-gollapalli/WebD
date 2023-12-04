@@ -37,11 +37,26 @@ router.get('/publicBlogs',async (req,res)=>{
         res.send({success:false,error});
     }
 })
+        // {
+        //     "user": {
+        //       "is": true,
+        //       "details": {
+        //         "id": "64feed7b4235b415a4366907",
+        //         "email": "jaya@gmail.com",
+        //         "name": "jayavardhan",
+        //         "iat": 1695050932
+        //       }
+        //     }
+        //   }
 router.get('/myBlogs',fetchUser,async (req,res)=>{
-    let public=await Blog.find({user:req.body.user,public:true});
-    let private=await Blog.find({public:false});
-    // console.log(blogs);
-    res.send({public,private});
+    if(req.body.user.is){
+        let public=await Blog.find({user:req.body.user.id,public:true});
+        let private=await Blog.find({user:req.body.user.id,public:false});
+        // console.log(jayavardhan);
+        res.send({success:true,public,private});
+    }else{
+        res.send({success:false,error:req.body.user.error});
+    }
 })
 
 //sends the blog details of the blog

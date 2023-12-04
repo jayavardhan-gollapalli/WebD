@@ -11,7 +11,7 @@ import { getUser } from './features/userSlice';
 import { useSelector } from 'react-redux/es/hooks/useSelector';
 import { logged } from './features/userSlice'; 
 import Blog from './components/Blog';
-import { getPublicBlogs } from './features/blogSlice';
+import { getPublicBlogs, getUserBlogs } from './features/blogSlice';
 
 function App() {
   const dispatch=useDispatch();
@@ -19,6 +19,7 @@ function App() {
     console.log("Initiating getting user details and public blogs")
     dispatch( getUser() );
     dispatch( getPublicBlogs() );
+    dispatch ( getUserBlogs() );
   })
   // let  loggedin = useSelector(logged);
   // console.log(loggedin);
